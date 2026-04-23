@@ -4,20 +4,19 @@ CFLAGS_PIC = $(CFLAGS) -fPIC
 LDFLAGS_MAIN = -pthread -lrt -lm
 LDFLAGS_CHILD = -lncurses -pthread -lrt -lm
 
-all: static shared
-static: main_static child_static
-shared: main_shared child_shared
+static: main_static child
+shared: main_shared child
 
 main_static: main.o libparent.a
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS_MAIN)
 
-child_static: child.o librender.a
+child: child.o librender.a
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS_CHILD)
 
 main_shared: main.o libparent.so
 	$(CC) $(CFLAGS) -o $@ $< -L. -lparent $(LDFLAGS_MAIN) -Wl,-rpath=.
 
-child_shared: child.o librender.so
+child: child.o librender.so
 	$(CC) $(CFLAGS) -o $@ $< -L. -lrender $(LDFLAGS_CHILD) -Wl,-rpath=.
 
 lib%.a: %.o
@@ -41,4 +40,4 @@ render.o render_pic.o: render.c render.h common.h
 	$(CC) $(CFLAGS_PIC) -c $< -o $@
 
 clean:
-	rm -f main_static main_shared child_static child_shared *.o *.a *.so
+	rm -f main_static main_shared child child *.o *.a *.so
